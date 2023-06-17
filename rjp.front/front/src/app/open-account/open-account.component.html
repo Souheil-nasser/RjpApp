@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">Open Account</div>
+          <div class="card-body">
+            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+            <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+            <form [formGroup]="openAccountForm" (ngSubmit)="openAccount()">
+                <div class="form-group">
+                    <label for="customerId">Customer</label>
+                    <select class="form-control" id="customerId" formControlName="customerId">
+                      <option *ngFor="let user of users" [value]="user.Id">{{ user.Name }}</option>
+                    </select>
+                  </div>
+                  
+              <div class="form-group">
+                <label for="initialCredit">Initial Credit</label>
+                <input type="number" class="form-control" id="initialCredit" formControlName="initialCredit">
+              </div>
+              <button type="submit" class="btn btn-primary">Open Account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
