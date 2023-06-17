@@ -1,14 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using rjp.data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace rjp.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -17,22 +22,51 @@ namespace rjp.api.Controllers
         {
             _context = context;
         }
+
         [HttpPost]
         public async Task<ActionResult<User>> AddUser(User user)
         {
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true,
+                PropertyNamingPolicy = null
+            };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+          
+            return Ok(user);
 
-            return Ok("User created successfully  " + user.Name);
         }
-        [HttpGet("{id}")]
-        public ActionResult<User> GetUser(int id)
+
+        [HttpGet]
+        public async Task<ActionResult<List<User>>> GetUsers()
         {
-            //eager loading 
-            var user = _context.Users
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true,
+                PropertyNamingPolicy = null
+        };
+
+            var users = await _context.Users
                 .Include(u => u.Accounts)
                     .ThenInclude(a => a.Transactions)
-                .FirstOrDefault(u => u.Id == id);
+                .ToListAsync();
+
+            string json = JsonSerializer.Serialize(users, options);
+
+            return Ok(json);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<object>> GetUser(int id)
+        {
+            var user = await _context.Users
+                .Include(u => u.Accounts)
+                    .ThenInclude(a => a.Transactions)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (user == null)
             {
                 return NotFound();
@@ -42,7 +76,7 @@ namespace rjp.api.Controllers
             {
                 Name = user.Name,
                 Surname = user.Surname,
-                Accounts = user.Accounts.Select(a => new //to only retrieve the balance and transaction amount and date
+                Accounts = user.Accounts.Select(a => new
                 {
                     Balance = a.Balance,
                     Transactions = a.Transactions.Select(t => new
@@ -52,9 +86,8 @@ namespace rjp.api.Controllers
                     }).ToList()
                 }).ToList()
             };
-           
+
             return Ok(userInformation);
         }
-
     }
 }
