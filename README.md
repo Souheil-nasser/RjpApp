@@ -1,1 +1,1 @@
-# RjpApp
+#to execute this app, run the backend part (rjp.data and rjp.api), created the rjp.data layer for the database related code and the rjp.api for the api controllers, allowed cross origins from localhost:4200 (angular app url), change the app url from the enviroment file in the rjp.front to your backend app url
