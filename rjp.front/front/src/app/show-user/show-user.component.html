@@ -1,1 +1,35 @@
-<p>show-user works!</p>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4>User Details</h4>
+        </div>
+        <div class="card-body">
+          <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+          <div *ngIf="user" class="user-details">
+            <h3>Name: {{ user.Name }}</h3>
+            <h4>Surname: {{ user.Surname }}</h4>
+            <h5>Balance: {{ totalBalance }} $</h5>
+            <h5>Accounts:</h5>
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let account of user.Accounts; let i = index">
+                <h5 class="mb-3">
+                  Account {{ i+1 }}
+                </h5>
+                <p>Balance: {{ account.Balance }}</p>
+                <p>Transactions:</p>
+                <ul class="list-group">
+                  <li class="list-group-item" *ngFor="let transaction of account.Transactions">
+                    <p>Amount: {{ transaction.Amount }}</p>
+                    <p>Date: {{ transaction.TransactionDate }}</p>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

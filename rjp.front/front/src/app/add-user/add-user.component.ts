@@ -1,26 +1,56 @@
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { RjpService } from '../services/rjpService';
 
 @Component({
   selector: 'app-add-user',
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.css']
 })
-export class AddUserComponent {
-  name: string= '';
-  surname: string = ''; 
+export class AddUserComponent implements OnInit {
+  userForm!: FormGroup; // Marked as undefined
 
-  constructor(private http: HttpClient) { }
+  successMessage: string;
+  errorMessage: string;
 
-  onSubmit() {
+  constructor(private formBuilder: FormBuilder, private rjpService: RjpService) {
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
+  ngOnInit(): void {
+    this.userForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      surname: ['', Validators.required]
+    });
+  }
+
+  addUser(): void {
+    if (this.userForm.invalid) {
+      return;
+    }
+
     const user = {
-      name: this.name,
-      surname: this.surname
+      name: this.userForm.value.name,
+      surname: this.userForm.value.surname
     };
 
-    this.http.post<any>('https://localhost:7146/api/Users', user).subscribe(response => {
-      console.log(JSON.stringify(response));
-      // Handle the response as needed
+    this.rjpService.addUser(user).subscribe({
+      next: (response: any) => {
+            this.successMessage = `User created successfully: ${response.name}`;
+ // Display success message
+        this.userForm.reset(); // Reset the form
+        this.errorMessage = ''; // Clear any previous error message
+      },
+      error: (error: any) => {
+        this.errorMessage = error.message; // Display error message
+        this.successMessage = ''; // Clear any previous success message
+      }
     });
   }
 }
+
+
+
+
+

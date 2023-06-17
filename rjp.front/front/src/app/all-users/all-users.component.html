@@ -1,0 +1,22 @@
+<div class="container">
+    <h2>User List</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Surname</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.Name }}</td>
+          <td>{{ user.Surname }}</td>
+          <td>
+            <button class="btn btn-primary" (click)="goToUser(user.Id)">View Details</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
